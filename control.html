@@ -22,7 +22,7 @@
       --teal: #4ecdc4;
       --green: #38b778;
       --green-soft: rgba(56, 183, 120, 0.18);
-      --red: #e05a5a;
+      --red: #ff2424;
       --red-soft: rgba(224, 90, 90, 0.18);
       --radius: 16px;
     }
@@ -706,7 +706,7 @@
       const tEl = $('previewTimer');
       const l = ctrl.live;
       if (l.screen === 'question' && !l.revealed && rem <= 0) {
-        tEl.textContent = 'ПАЛЬЦЫ В КАДР!';
+        tEl.textContent = 'КАРТОЧКИ В КАДР!';
         tEl.classList.add('danger');
       } else {
         tEl.textContent = `${rem} с`;
