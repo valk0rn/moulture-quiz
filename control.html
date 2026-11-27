@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Пульт — Викторина!</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Rubik:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f1218;
+      --surface: #171c25;
+      --surface-elevated: #1f2633;
+      --border: #2c3547;
+      --text: #eef1f6;
+      --text-muted: #97a4b8;
+      --accent: #6b5dd7;
+      --accent-hover: #7c6fe3;
+      --accent-soft: rgba(107, 93, 215, 0.16);
+      --valera-score: #e5a93c;
+      --teal: #4ecdc4;
+      --green: #38b778;
+      --green-soft: rgba(56, 183, 120, 0.18);
+      --red: #e05a5a;
+      --red-soft: rgba(224, 90, 90, 0.18);
+      --radius: 16px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .wrap {
+      max-width: 1120px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+    }
+
+    .header-left {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .header-title {
+      font-family: 'Rubik', sans-serif;
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--accent);
+    }
+
+    .header-sub {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .score-mini {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--surface-elevated);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 7px 16px;
+      font-family: 'Rubik', sans-serif;
+      font-size: 17px;
+      font-weight: 700;
+    }
+
+    .score-mini .v { color: var(--valera-score); font-size: 21px; }
+    .score-mini .a { color: var(--teal); font-size: 21px; }
+
+    .conn-badge {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: var(--surface-elevated);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+    }
+
+    .conn-badge.online {
+      background: var(--green-soft);
+      color: #79e8b0;
+      border-color: rgba(56, 183, 120, 0.4);
+    }
+
+    .conn-badge.error {
+      background: var(--red-soft);
+      color: #ff9494;
+      border-color: rgba(224, 90, 90, 0.45);
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    @media (max-width: 860px) {
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+
+    .col {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .card-title {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Предпросмотр того, что сейчас в OBS (без спойлеров) */
+    .preview-box {
+      background: #11151d;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .preview-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      background: var(--accent-soft);
+      color: #9e93f0;
+      border: 1px solid rgba(107, 93, 215, 0.45);
+    }
+
+    .preview-timer {
+      font-family: 'Rubik', sans-serif;
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--text);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .preview-timer.danger { color: var(--red); }
+
+    .preview-q {
+      font-family: 'Rubik', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1.32;
+    }
+
+    .preview-opts {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    @media (max-width: 600px) {
+      .preview-opts { grid-template-columns: 1fr; }
+    }
+
+    .preview-opt {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 9px 11px;
+      font-size: 13px;
+      line-height: 1.3;
+    }
+
+    .preview-opt strong {
+      color: var(--accent);
+      margin-right: 6px;
+    }
+
+    .preview-opt.correct {
+      background: var(--green-soft);
+      border-color: var(--green);
+    }
+
+    .preview-exp {
+      font-size: 13px;
+      color: #d6e2f0;
+      border-left: 3px solid var(--green);
+      padding-left: 10px;
+      line-height: 1.4;
+    }
+
+    .btn-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .btn-full {
+      grid-column: 1 / -1;
+    }
+
+    .btn {
+      appearance: none;
+      border: 1px solid var(--border);
+      background: var(--surface-elevated);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 12px 14px;
+      border-radius: 11px;
+      cursor: pointer;
+      transition: background 0.15s ease, border-color 0.15s ease, transform 0.08s ease;
+      text-align: center;
+    }
+
+    .btn:hover:not(:disabled) {
+      background: #283142;
+      border-color: #3f4c66;
+    }
+
+    .btn:active:not(:disabled) {
+      transform: scale(0.985);
+    }
+
+    .btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #ffffff;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: var(--accent-hover);
+      border-color: var(--accent-hover);
+    }
+
+    .btn-green {
+      background: var(--green-soft);
+      color: #7ceab2;
+      border-color: rgba(56, 183, 120, 0.45);
+    }
+
+    .btn-green:hover:not(:disabled) {
+      background: rgba(56, 183, 120, 0.28);
+    }
+
+    .btn-danger {
+      background: var(--red-soft);
+      color: #ff9c9c;
+      border-color: rgba(224, 90, 90, 0.45);
+    }
+
+    .btn-danger:hover:not(:disabled) {
+      background: rgba(224, 90, 90, 0.28);
+    }
+
+    .toggle-chip {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 12px;
+      border-radius: 11px;
+      border: 1px solid var(--border);
+      background: var(--surface-elevated);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .toggle-chip.active {
+      background: var(--red-soft);
+      border-color: var(--red);
+      color: #ff9c9c;
+    }
+
+    .manual-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding-top: 4px;
+      font-size: 14px;
+      flex-wrap: wrap;
+    }
+
+    .manual-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .mini-btn {
+      width: 34px;
+      height: 32px;
+      padding: 0;
+      font-size: 16px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .field label {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .field input {
+      width: 100%;
+      background: #10141c;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      outline: none;
+    }
+
+    .field input:focus {
+      border-color: var(--accent);
+    }
+
+    .log-box {
+      font-size: 13px;
+      line-height: 1.45;
+      color: #c7d2e2;
+      background: #10141c;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      min-height: 42px;
+    }
+
+    .hotkeys {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .kbd {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 6px;
+      background: var(--surface-elevated);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    input[type="file"] { display: none; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="header">
+      <div class="header-left">
+        <div class="header-title">Пульт управления · Викторина!</div>
+        <div class="header-sub" id="seasonSubtitle">Зимний кубок · управление экраном OBS из браузера</div>
+      </div>
+      <div class="header-right">
+        <div class="score-mini">
+          <span>Валерий</span>
+          <span class="v" id="scoreValera">0</span>
+          <span>:</span>
+          <span class="a" id="scoreAlex">0</span>
+          <span>Алекс</span>
+        </div>
+        <span class="conn-badge" id="connBadge">Не подключено</span>
+      </div>
+    </header>
+
+    <div class="grid-2">
+      <div class="col">
+        <section class="card">
+          <div class="card-title">
+            <span>Сейчас в кадре OBS</span>
+            <span id="bankCounter">Колода: —</span>
+          </div>
+          <div class="preview-box" id="previewBox">
+            <div class="preview-meta">
+              <span class="badge" id="previewStateBadge">Экран паузы</span>
+              <span class="preview-timer" id="previewTimer">25 с</span>
+            </div>
+            <div class="preview-q" id="previewQuestion">Нажми «Следующий вопрос», чтобы вывести карточку в OBS.</div>
+            <div class="preview-opts" id="previewOpts"></div>
+            <div class="preview-exp" id="previewExp" style="display:none;"></div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-title">Управление раундом</div>
+          <div class="btn-grid">
+            <button class="btn btn-primary btn-full" id="btnNext">Следующий вопрос</button>
+            <button class="btn" id="btnTimerToggle">Пауза / Старт таймера</button>
+            <button class="btn" id="btnTimerRestart">Перезапустить таймер</button>
+            <button class="btn btn-green btn-full" id="btnReveal">Показать ответ</button>
+            <button class="btn btn-full" id="btnStandby">Вернуть экран паузы</button>
+          </div>
+          <div class="hotkeys">
+            Горячие клавиши: <span class="kbd">Пробел</span> новый вопрос, <span class="kbd">T</span> пауза таймера, <span class="kbd">Enter</span> ответ, <span class="kbd">H</span> экран паузы.
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-title">Очки раунда и Ва-банк</div>
+          <div class="btn-grid">
+            <div class="toggle-chip" id="vbValera">Ва-банк: Валерий</div>
+            <div class="toggle-chip" id="vbAlex">Ва-банк: Алекс</div>
+            <button class="btn" id="btnScoreBoth">Оба угадали (+1 / +1)</button>
+            <button class="btn" id="btnScoreNone">Оба мимо (0 / 0)</button>
+            <button class="btn" id="btnScoreValera">Только Валерий (+2)</button>
+            <button class="btn" id="btnScoreAlex">Только Алекс (+2)</button>
+          </div>
+          <div class="manual-row">
+            <div class="manual-group">
+              <span>Валерий:</span>
+              <button class="btn mini-btn" id="btnValMinus">−</button>
+              <button class="btn mini-btn" id="btnValPlus">+</button>
+            </div>
+            <div class="manual-group">
+              <span>Алекс:</span>
+              <button class="btn mini-btn" id="btnAlexMinus">−</button>
+              <button class="btn mini-btn" id="btnAlexPlus">+</button>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div class="col">
+        <section class="card">
+          <div class="card-title">База вопросов (без спойлеров)</div>
+          <div class="btn-grid">
+            <button class="btn btn-primary btn-full" id="btnPullAniList">Подтянуть +12 из AniList</button>
+            <button class="btn btn-full" id="btnImportJson">Загрузить слепой JSON-пакет</button>
+            <button class="btn btn-full" id="btnSync">Обновить статус из таблицы</button>
+          </div>
+          <input type="file" id="jsonFileInput" accept=".json">
+          <div class="log-box" id="statusLog">Подключи ссылку Google Apps Script ниже и нажми «Сохранить настройки».</div>
+        </section>
+
+        <section class="card">
+          <div class="card-title">Ссылки для OBS и других ПК</div>
+          <div class="btn-grid">
+            <button class="btn btn-primary btn-full" id="btnCopyObsLink">Скопировать ссылку для OBS (index.html)</button>
+            <button class="btn btn-full" id="btnCopyControlLink">Скопировать ссылку на пульт (для другого ПК)</button>
+            <button class="btn btn-full" id="btnOpenObsTab">Открыть экран OBS в новой вкладке</button>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-title">Облако и настройки</div>
+          <div class="field">
+            <label for="inputApiUrl">Ссылка Google Apps Script (Web App URL)</label>
+            <input type="text" id="inputApiUrl" placeholder="https://script.google.com/macros/s/.../exec">
+          </div>
+          <div class="field">
+            <label for="inputPin">PIN-код (если задан в таблице)</label>
+            <input type="password" id="inputPin" placeholder="Необязательно">
+          </div>
+          <div class="btn-grid">
+            <div class="field">
+              <label for="inputSeason">Название сезона</label>
+              <input type="text" id="inputSeason" value="Зимний кубок">
+            </div>
+            <div class="field">
+              <label for="inputTimer">Таймер (сек)</label>
+              <input type="number" id="inputTimer" value="25" min="5" max="180">
+            </div>
+          </div>
+          <div class="btn-grid">
+            <button class="btn btn-green" id="btnSaveSettings">Сохранить настройки</button>
+            <button class="btn" id="btnToggleSound">Звук в OBS: ВКЛ</button>
+            <button class="btn btn-danger" id="btnResetScores">Сбросить счет</button>
+            <button class="btn btn-danger" id="btnResetUsed">Вернуть сыгранные</button>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'moulture_quiz_config_v2';
+
+    const ctrl = {
+      apiUrl: '',
+      pin: '',
+      clockOffset: 0,
+      busy: false,
+      live: {
+        season_name: 'Зимний кубок',
+        score_valera: 0,
+        score_alex: 0,
+        timer_seconds: 25,
+        sound_on: true,
+        screen: 'standby',
+        question: null,
+        revealed: false,
+        vabank_valera: false,
+        vabank_alex: false,
+        timer_status: 'stopped',
+        timer_end_ts: 0,
+        timer_remaining: 25,
+        stats: { total: 0, used: 0, unused: 0 }
+      }
+    };
+
+    const $ = (id) => document.getElementById(id);
+
+    function logMsg(msg) {
+      $('statusLog').textContent = msg;
+    }
+
+    function setConn(mode, text) {
+      const el = $('connBadge');
+      el.className = 'conn-badge' + (mode ? ' ' + mode : '');
+      el.textContent = text;
+    }
+
+    function escapeHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function loadLocalConfig() {
+      const params = new URLSearchParams(window.location.search);
+      const urlApi = (params.get('api') || '').trim();
+      const urlPin = (params.get('pin') || '').trim();
+
+      let saved = {};
+      try {
+        saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+      } catch (e) {}
+
+      ctrl.apiUrl = urlApi || (saved.apiUrl || '').trim();
+      ctrl.pin = urlPin || (saved.pin || '').trim();
+
+      if (urlApi) saveLocalConfig();
+
+      $('inputApiUrl').value = ctrl.apiUrl;
+      $('inputPin').value = ctrl.pin;
+    }
+
+    function saveLocalConfig() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        apiUrl: ctrl.apiUrl,
+        pin: ctrl.pin
+      }));
+    }
+
+    function applyServerData(data) {
+      if (data.server_now) {
+        ctrl.clockOffset = data.server_now - Date.now();
+      }
+      if (data.live) {
+        ctrl.live = data.live;
+        $('inputSeason').value = ctrl.live.season_name || 'Зимний кубок';
+        $('inputTimer').value = ctrl.live.timer_seconds || 25;
+      }
+      renderUI();
+    }
+
+    async function apiSync() {
+      if (!ctrl.apiUrl) {
+        setConn('', 'Не подключено');
+        renderUI();
+        return;
+      }
+      setConn('', 'Синхронизация...');
+      try {
+        const sep = ctrl.apiUrl.includes('?') ? '&' : '?';
+        const res = await fetch(`${ctrl.apiUrl}${sep}_=${Date.now()}`, { method: 'GET', redirect: 'follow' });
+        const data = await res.json();
+        if (!data.ok) throw new Error(data.error || 'Ошибка таблицы');
+        applyServerData(data);
+        setConn('online', 'Google Таблица');
+        const st = ctrl.live.stats || { total: 0, unused: 0 };
+        logMsg(`Подключено. Готово вопросов: ${st.unused} (всего в базе: ${st.total}).`);
+      } catch (err) {
+        setConn('error', 'Ошибка связи');
+        logMsg('Не удалось подключиться: ' + err.message);
+      }
+    }
+
+    async function apiPost(payload) {
+      if (!ctrl.apiUrl) {
+        logMsg('Сначала вставь ссылку Google Apps Script и нажми «Сохранить настройки».');
+        return null;
+      }
+      if (ctrl.busy) return null;
+      ctrl.busy = true;
+      setButtonsDisabled(true);
+      try {
+        const res = await fetch(ctrl.apiUrl, {
+          method: 'POST',
+          redirect: 'follow',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ ...payload, pin: ctrl.pin })
+        });
+        const data = await res.json();
+        if (!data.ok) throw new Error(data.error || 'Ошибка выполнения');
+        applyServerData(data);
+        setConn('online', 'Google Таблица');
+        return data;
+      } catch (err) {
+        logMsg('Ошибка: ' + err.message);
+        return null;
+      } finally {
+        ctrl.busy = false;
+        setButtonsDisabled(false);
+      }
+    }
+
+    function setButtonsDisabled(flag) {
+      const ids = [
+        'btnNext', 'btnTimerToggle', 'btnTimerRestart', 'btnReveal', 'btnStandby',
+        'btnScoreBoth', 'btnScoreNone', 'btnScoreValera', 'btnScoreAlex',
+        'btnPullAniList', 'btnImportJson', 'btnSync', 'btnSaveSettings',
+        'btnToggleSound', 'btnResetScores', 'btnResetUsed'
+      ];
+      ids.forEach(id => {
+        const el = $(id);
+        if (el) el.disabled = flag;
+      });
+    }
+
+    function getRemainingSec() {
+      const l = ctrl.live;
+      if (l.screen !== 'question') return Number(l.timer_seconds) || 25;
+      if (l.revealed) return 0;
+      if (l.timer_status === 'running' && l.timer_end_ts) {
+        const now = Date.now() + ctrl.clockOffset;
+        return Math.max(0, Math.ceil((l.timer_end_ts - now) / 1000));
+      }
+      return Math.max(0, Number(l.timer_remaining) || 0);
+    }
+
+    function renderTimer() {
+      const rem = getRemainingSec();
+      const tEl = $('previewTimer');
+      const l = ctrl.live;
+      if (l.screen === 'question' && !l.revealed && rem <= 0) {
+        tEl.textContent = 'ПАЛЬЦЫ В КАДР!';
+        tEl.classList.add('danger');
+      } else {
+        tEl.textContent = `${rem} с`;
+        tEl.classList.toggle('danger', l.screen === 'question' && !l.revealed && rem <= 5);
+      }
+    }
+
+    function renderUI() {
+      const l = ctrl.live;
+      $('seasonSubtitle').textContent = `${l.season_name || 'Зимний кубок'} · управление экраном OBS из браузера`;
+      $('scoreValera').textContent = l.score_valera || 0;
+      $('scoreAlex').textContent = l.score_alex || 0;
+      $('vbValera').classList.toggle('active', Boolean(l.vabank_valera));
+      $('vbAlex').classList.toggle('active', Boolean(l.vabank_alex));
+      $('btnToggleSound').textContent = 'Звук в OBS: ' + (l.sound_on ? 'ВКЛ' : 'ВЫКЛ');
+
+      const st = l.stats || { total: 0, used: 0, unused: 0 };
+      $('bankCounter').textContent = `В колоде: ${st.unused} · Сыграно: ${st.used}`;
+
+      const badge = $('previewStateBadge');
+      const qEl = $('previewQuestion');
+      const optsEl = $('previewOpts');
+      const expEl = $('previewExp');
+
+      if (l.screen !== 'question' || !l.question) {
+        badge.textContent = 'Экран паузы';
+        qEl.textContent = 'В OBS сейчас заставка «Викторина!». Нажми «Следующий вопрос» для старта раунда.';
+        optsEl.innerHTML = '';
+        expEl.style.display = 'none';
+      } else {
+        badge.textContent = `${l.question.category || 'ВИКТОРИНА'} · ${l.revealed ? 'Ответ открыт' : 'Ответ скрыт'}`;
+        qEl.textContent = l.question.question || '';
+        optsEl.innerHTML = '';
+        (l.question.options || []).forEach((raw, idx) => {
+          const num = idx + 1;
+          const clean = String(raw).replace(/\s*\|\|\s*/g, ' — ');
+          const div = document.createElement('div');
+          div.className = 'preview-opt' + (l.revealed && num === Number(l.question.correct) ? ' correct' : '');
+          div.innerHTML = `<strong>${num}.</strong>${escapeHtml(clean)}`;
+          optsEl.appendChild(div);
+        });
+        if (l.revealed && l.question.explanation) {
+          expEl.textContent = l.question.explanation;
+          expEl.style.display = 'block';
+        } else {
+          expEl.style.display = 'none';
+        }
+      }
+
+      renderTimer();
+    }
+
+    /* Построение ссылок на index.html и control.html */
+    function buildPageUrl(filename) {
+      const current = new URL(window.location.href);
+      const dir = current.pathname.replace(/[^/]*$/, '');
+      const target = new URL(current.origin + dir + (filename === 'index.html' ? '' : filename));
+      if (ctrl.apiUrl) target.searchParams.set('api', ctrl.apiUrl);
+      return target.toString();
+    }
+
+    async function copyToClipboard(text, successMsg) {
+      try {
+        await navigator.clipboard.writeText(text);
+        logMsg(successMsg);
+      } catch (e) {
+        logMsg('Ссылка: ' + text);
+      }
+    }
+
+    /* Живой генератор вопросов из AniList API */
+    function shuffle(arr) {
+      const a = arr.slice();
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function formatAnimeOption(m) {
+      const romaji = (m.title && m.title.romaji) ? m.title.romaji.trim() : '';
+      const eng = (m.title && m.title.english) ? m.title.english.trim() : '';
+      if (eng && romaji && eng.toLowerCase() !== romaji.toLowerCase()) {
+        return `${romaji} || ${eng}`;
+      }
+      return romaji || eng || 'Без названия';
+    }
+
+    function shortTitle(m) {
+      return (m.title && (m.title.romaji || m.title.english)) || 'Тайтл';
+    }
+
+    function buildAniListQuestions(mediaList) {
+      const generated = [];
+      const usedMediaIds = new Set();
+
+      function pickFour(filterFn, validatorFn) {
+        const candidates = shuffle(mediaList.filter(m => !usedMediaIds.has(m.id) && filterFn(m)));
+        for (let attempt = 0; attempt < 40 && candidates.length >= 4; attempt++) {
+          const sample = shuffle(candidates).slice(0, 4);
+          if (validatorFn(sample)) {
+            sample.forEach(m => usedMediaIds.add(m.id));
+            return sample;
+          }
+        }
+        return null;
+      }
+
+      for (let k = 0; k < 3; k++) {
+        const four = pickFour(
+          m => m.startDate && m.startDate.year >= 1978 && m.startDate.year <= 2025,
+          s => {
+            const years = s.map(x => x.startDate.year);
+            const minY = Math.min(...years);
+            return years.filter(y => y === minY).length === 1 && (Math.max(...years) - minY) >= 2;
+          }
+        );
+        if (four) {
+          const minY = Math.min(...four.map(x => x.startDate.year));
+          const correctIdx = four.findIndex(x => x.startDate.year === minY) + 1;
+          const summary = four.map(x => `${shortTitle(x)} (${x.startDate.year})`).join(' · ');
+          generated.push({
+            id: `al_year_${four.map(x => x.id).sort().join('_')}`,
+            category: 'ХРОНОЛОГИЯ',
+            question: 'Какое из этих аниме вышло раньше остальных?',
+            options: four.map(formatAnimeOption),
+            correct: correctIdx,
+            explanation: `Премьеры по базе AniList: ${summary}.`,
+            source: 'AniList'
+          });
+        }
+      }
+
+      for (let k = 0; k < 3; k++) {
+        const four = pickFour(
+          m => m.averageScore && m.averageScore >= 55,
+          s => {
+            const sorted = s.map(x => x.averageScore).sort((a, b) => b - a);
+            return (sorted[0] - sorted[1]) >= 3;
+          }
+        );
+        if (four) {
+          const maxScore = Math.max(...four.map(x => x.averageScore));
+          const correctIdx = four.findIndex(x => x.averageScore === maxScore) + 1;
+          const summary = four.map(x => `${shortTitle(x)} — ${x.averageScore}%`).join(' · ');
+          generated.push({
+            id: `al_score_${four.map(x => x.id).sort().join('_')}`,
+            category: 'ВКУС ПРОТИВ РЕЙТИНГА',
+            question: 'У какого из этих тайтлов самая высокая средняя оценка на AniList?',
+            options: four.map(formatAnimeOption),
+            correct: correctIdx,
+            explanation: `Оценки зрителей на AniList: ${summary}.`,
+            source: 'AniList'
+          });
+        }
+      }
+
+      for (let k = 0; k < 3; k++) {
+        const four = pickFour(
+          m => m.format === 'TV' && m.episodes && m.episodes >= 6 && m.episodes <= 300,
+          s => {
+            const sorted = s.map(x => x.episodes).sort((a, b) => b - a);
+            return (sorted[0] - sorted[1]) >= 2;
+          }
+        );
+        if (four) {
+          const maxEp = Math.max(...four.map(x => x.episodes));
+          const correctIdx = four.findIndex(x => x.episodes === maxEp) + 1;
+          const summary = four.map(x => `${shortTitle(x)} — ${x.episodes} эп.`).join(' · ');
+          generated.push({
+            id: `al_ep_${four.map(x => x.id).sort().join('_')}`,
+            category: 'ЦИФРЫ И ФАКТЫ',
+            question: 'В каком из этих телесериалов больше всего эпизодов?',
+            options: four.map(formatAnimeOption),
+            correct: correctIdx,
+            explanation: `Число серий в базе AniList: ${summary}.`,
+            source: 'AniList'
+          });
+        }
+      }
+
+      const withStudio = shuffle(mediaList.filter(
+        m => !usedMediaIds.has(m.id) && m.studios && m.studios.nodes && m.studios.nodes.length > 0
+      ));
+      for (let k = 0; k < 3 && withStudio.length >= 4; k++) {
+        const target = withStudio.shift();
+        const targetStudio = target.studios.nodes[0].name;
+        const others = shuffle(withStudio.filter(
+          m => !m.studios.nodes.some(st => st.name === targetStudio)
+        )).slice(0, 3);
+        if (others.length === 3) {
+          const four = shuffle([target, ...others]);
+          const correctIdx = four.findIndex(x => x.id === target.id) + 1;
+          const summary = four.map(x => `${shortTitle(x)} — ${x.studios.nodes[0].name}`).join(' · ');
+          generated.push({
+            id: `al_studio_${target.id}_${others.map(x => x.id).join('_')}`,
+            category: 'СТУДИЙНЫЙ ПОЧЕРК',
+            question: `Какой из этих тайтлов сняла студия ${targetStudio}?`,
+            options: four.map(formatAnimeOption),
+            correct: correctIdx,
+            explanation: `Основные студии: ${summary}.`,
+            source: 'AniList'
+          });
+        }
+      }
+
+      return generated;
+    }
+
+    async function pullAniList() {
+      if (!ctrl.apiUrl) {
+        logMsg('Сначала подключи ссылку Google Apps Script.');
+        return;
+      }
+      logMsg('Запрашиваю свежую подборку из AniList...');
+      try {
+        const sortMode = Math.random() > 0.4 ? 'POPULARITY_DESC' : 'SCORE_DESC';
+        const page = Math.floor(Math.random() * 28) + 1;
+        const query = `
+          query ($page: Int, $sort: [MediaSort]) {
+            Page(page: $page, perPage: 50) {
+              media(type: ANIME, sort: $sort, isAdult: false, format_in: [TV, MOVIE, OVA]) {
+                id
+                title { romaji english }
+                startDate { year }
+                averageScore
+                episodes
+                format
+                studios(isMain: true) { nodes { name } }
+              }
+            }
+          }
+        `;
+        const res = await fetch('https://graphql.anilist.co', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({ query, variables: { page, sort: [sortMode] } })
+        });
+        const json = await res.json();
+        const list = (json.data && json.data.Page && json.data.Page.media) || [];
+        const newQs = buildAniListQuestions(list);
+        if (!newQs.length) throw new Error('Не удалось собрать вопросы, попробуй еще раз.');
+
+        const resp = await apiPost({ action: 'addQuestions', questions: newQs });
+        if (resp) {
+          logMsg(`AniList: добавлено ${resp.added} новых вопросов. Всего в колоде: ${resp.live.stats.unused}.`);
+        }
+      } catch (err) {
+        logMsg('Ошибка AniList: ' + err.message);
+      }
+    }
+
+    function handleJsonFile(file) {
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          const list = Array.isArray(parsed) ? parsed : (parsed.questions || []);
+          if (!Array.isArray(list) || list.length === 0) {
+            throw new Error('Файл не содержит массива вопросов.');
+          }
+          logMsg('Отправляю JSON-пакет в таблицу вслепую...');
+          const resp = await apiPost({ action: 'addQuestions', questions: list });
+          if (resp) {
+            logMsg(`JSON-пакет загружен: добавлено ${resp.added} новых вопросов. Всего в колоде: ${resp.live.stats.unused}.`);
+          }
+        } catch (err) {
+          logMsg('Ошибка JSON: ' + err.message);
+        } finally {
+          $('jsonFileInput').value = '';
+        }
+      };
+      reader.readAsText(file, 'utf-8');
+    }
+
+    /* Обработчики кнопок */
+    $('btnNext').addEventListener('click', async () => {
+      logMsg('Выбираю случайный вопрос для OBS...');
+      const r = await apiPost({ action: 'nextQuestion' });
+      if (r) logMsg('Вопрос отправлен в OBS, таймер запущен.');
+    });
+
+    $('btnTimerToggle').addEventListener('click', async () => {
+      const r = await apiPost({ action: 'timerToggle' });
+      if (r) logMsg(r.live.timer_status === 'running' ? 'Таймер запущен.' : 'Таймер на паузе.');
+    });
+
+    $('btnTimerRestart').addEventListener('click', async () => {
+      const r = await apiPost({ action: 'timerRestart' });
+      if (r) logMsg('Таймер перезапущен заново.');
+    });
+
+    $('btnReveal').addEventListener('click', async () => {
+      const r = await apiPost({ action: 'reveal' });
+      if (r) logMsg('Правильный ответ открыт в OBS и помечен сыгранным.');
+    });
+
+    $('btnStandby').addEventListener('click', async () => {
+      const r = await apiPost({ action: 'standby' });
+      if (r) logMsg('На экране OBS возвращена заставка «Викторина!».');
+    });
+
+    $('vbValera').addEventListener('click', async () => {
+      await apiPost({ action: 'setVabank', vabank_valera: !ctrl.live.vabank_valera });
+    });
+
+    $('vbAlex').addEventListener('click', async () => {
+      await apiPost({ action: 'setVabank', vabank_alex: !ctrl.live.vabank_alex });
+    });
+
+    async function sendRoundScore(vRight, aRight) {
+      const r = await apiPost({ action: 'applyScore', mode: 'round', valera_right: vRight, alex_right: aRight });
+      if (r) {
+        const dv = r.delta_valera >= 0 ? '+' + r.delta_valera : r.delta_valera;
+        const da = r.delta_alex >= 0 ? '+' + r.delta_alex : r.delta_alex;
+        logMsg(`Очки начислены: Валерий ${dv}, Алекс ${da}.`);
+      }
+    }
+
+    $('btnScoreBoth').addEventListener('click', () => sendRoundScore(true, true));
+    $('btnScoreNone').addEventListener('click', () => sendRoundScore(false, false));
+    $('btnScoreValera').addEventListener('click', () => sendRoundScore(true, false));
+    $('btnScoreAlex').addEventListener('click', () => sendRoundScore(false, true));
+
+    $('btnValMinus').addEventListener('click', () => apiPost({ action: 'applyScore', delta_valera: -1, delta_alex: 0 }));
+    $('btnValPlus').addEventListener('click', () => apiPost({ action: 'applyScore', delta_valera: 1, delta_alex: 0 }));
+    $('btnAlexMinus').addEventListener('click', () => apiPost({ action: 'applyScore', delta_valera: 0, delta_alex: -1 }));
+    $('btnAlexPlus').addEventListener('click', () => apiPost({ action: 'applyScore', delta_valera: 0, delta_alex: 1 }));
+
+    $('btnPullAniList').addEventListener('click', pullAniList);
+    $('btnImportJson').addEventListener('click', () => $('jsonFileInput').click());
+    $('jsonFileInput').addEventListener('change', (e) => handleJsonFile(e.target.files[0]));
+    $('btnSync').addEventListener('click', apiSync);
+
+    $('btnSaveSettings').addEventListener('click', async () => {
+      ctrl.apiUrl = $('inputApiUrl').value.trim();
+      ctrl.pin = $('inputPin').value.trim();
+      saveLocalConfig();
+      const season = $('inputSeason').value.trim() || 'Зимний кубок';
+      const timerSec = Math.max(5, Number($('inputTimer').value) || 25);
+      const r = await apiPost({ action: 'saveSettings', season_name: season, timer_seconds: timerSec });
+      if (r) logMsg('Настройки сохранены и применены в OBS.');
+    });
+
+    $('btnToggleSound').addEventListener('click', async () => {
+      const r = await apiPost({ action: 'saveSettings', sound_on: !ctrl.live.sound_on });
+      if (r) logMsg('Звук в OBS: ' + (r.live.sound_on ? 'ВКЛ' : 'ВЫКЛ'));
+    });
+
+    $('btnCopyObsLink').addEventListener('click', () => {
+      copyToClipboard(buildPageUrl('index.html'), 'Ссылка для источника «Браузер» в OBS скопирована.');
+    });
+
+    $('btnCopyControlLink').addEventListener('click', () => {
+      copyToClipboard(buildPageUrl('control.html'), 'Ссылка на пульт управления скопирована (можно открыть с другого ПК или телефона).');
+    });
+
+    $('btnOpenObsTab').addEventListener('click', () => {
+      window.open(buildPageUrl('index.html'), '_blank');
+    });
+
+    $('btnResetScores').addEventListener('click', async () => {
+      if (!confirm('Обнулить сезонный счет Валерия и Алекса?')) return;
+      const r = await apiPost({ action: 'resetScores' });
+      if (r) logMsg('Сезонный счет обнулен.');
+    });
+
+    $('btnResetUsed').addEventListener('click', async () => {
+      if (!confirm('Вернуть все сыгранные вопросы обратно в колоду?')) return;
+      const r = await apiPost({ action: 'resetUsed' });
+      if (r) logMsg(`Все вопросы возвращены в колоду. Доступно: ${r.live.stats.unused}.`);
+    });
+
+    window.addEventListener('keydown', (e) => {
+      const tag = (e.target && e.target.tagName) ? e.target.tagName.toUpperCase() : '';
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || ctrl.busy) return;
+
+      if (e.code === 'Space') {
+        e.preventDefault();
+        $('btnNext').click();
+      } else if (e.code === 'Enter') {
+        e.preventDefault();
+        $('btnReveal').click();
+      } else if (e.code === 'KeyT') {
+        e.preventDefault();
+        $('btnTimerToggle').click();
+      } else if (e.code === 'KeyH') {
+        e.preventDefault();
+        $('btnStandby').click();
+      }
+    });
+
+    loadLocalConfig();
+    apiSync();
+    setInterval(renderTimer, 250);
+  </script>
+</body>
+</html>
