@@ -9,17 +9,17 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Rubik:wght@600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --border: rgba(168, 184, 218, 0.42);
+      --border: rgba(168, 184, 218, 0.45);
       --text: #f2f5fa;
-      --text-muted: #c2cde0;
+      --text-muted: #c6d1e3;
       --accent: #6b5dd7;
       --accent-border: rgba(107, 93, 215, 0.85);
       --valera-score: #e5a93c;
       --teal: #4ecdc4;
       --green: #38b778;
-      --red: #e05a5a;
+      --red: #ff2424;
       --radius: 22px;
-      --text-shadow: 0 2px 10px rgba(0, 0, 0, 0.72);
+      --text-shadow: 0 2px 10px rgba(0, 0, 0, 0.78);
     }
 
     * {
@@ -44,12 +44,12 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      padding: 2.8vh 3.4vw 2.6vh;
+      padding: 2.6vh 3.4vw 2.6vh;
       background: transparent !important;
-      gap: 2vh;
+      gap: 1.8vh;
     }
 
-    /* Верхняя панель */
+    /* Верхняя панель без внешних рамок */
     .topbar {
       display: flex;
       align-items: center;
@@ -60,16 +60,14 @@
     .brand-pill {
       display: inline-flex;
       align-items: center;
-      gap: 0.75vw;
       background: transparent;
-      border: 2px solid var(--accent-border);
-      border-radius: 999px;
-      padding: 1.25vh 2.1vw;
+      border: none;
+      padding: 0;
     }
 
     .brand-title {
       font-family: 'Rubik', sans-serif;
-      font-size: clamp(24px, 2.05vw, 42px);
+      font-size: clamp(26px, 2.2vw, 44px);
       font-weight: 800;
       letter-spacing: 0.01em;
       color: var(--accent);
@@ -81,21 +79,20 @@
       display: flex;
       align-items: center;
       background: transparent;
-      border: 2px solid var(--border);
-      border-radius: 999px;
-      padding: 1vh 2.1vw;
-      gap: 1.5vw;
+      border: none;
+      padding: 0;
+      gap: 1.4vw;
     }
 
     .player {
       display: flex;
       align-items: center;
-      gap: 1vw;
+      gap: 0.95vw;
     }
 
     .player-name {
       font-family: 'Rubik', sans-serif;
-      font-size: clamp(22px, 1.9vw, 38px);
+      font-size: clamp(24px, 2vw, 40px);
       font-weight: 700;
       letter-spacing: 0.01em;
       color: var(--text);
@@ -104,7 +101,7 @@
 
     .player-score {
       font-family: 'Rubik', sans-serif;
-      font-size: clamp(32px, 2.75vw, 56px);
+      font-size: clamp(34px, 2.85vw, 58px);
       font-weight: 800;
       min-width: 2.1ch;
       text-align: center;
@@ -121,7 +118,7 @@
 
     .score-sep {
       font-family: 'Rubik', sans-serif;
-      font-size: clamp(26px, 2.2vw, 44px);
+      font-size: clamp(28px, 2.3vw, 46px);
       color: var(--text-muted);
       font-weight: 700;
       text-shadow: var(--text-shadow);
@@ -130,15 +127,15 @@
     .vabank-pill {
       display: none;
       font-family: 'Rubik', sans-serif;
-      font-size: clamp(14px, 1.05vw, 22px);
+      font-size: clamp(15px, 1.1vw, 22px);
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.05em;
-      padding: 0.55vh 0.9vw;
+      padding: 0.5vh 0.9vw;
       border-radius: 999px;
       background: transparent;
       color: #ff8e8e;
-      border: 2px solid rgba(224, 90, 90, 0.8);
+      border: 2px solid rgba(224, 90, 90, 0.85);
       text-shadow: var(--text-shadow);
     }
 
@@ -170,29 +167,14 @@
       text-align: center;
       gap: 2.4vh;
       background: transparent;
-      border: 2px solid var(--accent-border);
-      border-radius: 30px;
-      padding: 5.5vh 5vw;
-      max-width: 80vw;
-    }
-
-    .standby-badge {
-      padding: 0.9vh 1.8vw;
-      border-radius: 999px;
-      background: transparent;
-      border: 2px solid var(--accent-border);
-      color: var(--accent);
-      font-family: 'Rubik', sans-serif;
-      font-size: clamp(18px, 1.35vw, 27px);
-      font-weight: 700;
-      letter-spacing: 0.07em;
-      text-transform: uppercase;
-      text-shadow: var(--text-shadow);
+      border: none;
+      padding: 2vh 2vw;
+      max-width: 84vw;
     }
 
     .standby-title {
       font-family: 'Rubik', sans-serif;
-      font-size: clamp(54px, 5.8vw, 114px);
+      font-size: clamp(60px, 6.4vw, 126px);
       font-weight: 800;
       line-height: 1.05;
       color: var(--text);
@@ -200,30 +182,30 @@
     }
 
     .standby-sub {
-      font-size: clamp(22px, 1.95vw, 38px);
+      font-size: clamp(24px, 2.1vw, 42px);
       color: var(--text-muted);
-      max-width: 62vw;
-      line-height: 1.38;
+      max-width: 68vw;
+      line-height: 1.35;
       font-weight: 500;
       text-shadow: var(--text-shadow);
     }
 
     .standby-meta {
-      margin-top: 0.6vh;
-      font-size: clamp(18px, 1.35vw, 26px);
+      margin-top: 0.8vh;
+      font-size: clamp(20px, 1.45vw, 28px);
       color: var(--text-muted);
-      padding: 1vh 1.8vw;
+      padding: 0.8vh 1.4vw;
       background: transparent;
-      border: 2px solid var(--border);
+      border: none;
       border-radius: 14px;
       font-weight: 500;
       text-shadow: var(--text-shadow);
-      max-width: 72vw;
+      max-width: 74vw;
       word-break: break-word;
     }
 
     .standby-meta.error {
-      border-color: rgba(224, 90, 90, 0.85);
+      border: 2px solid rgba(224, 90, 90, 0.85);
       color: #ff9e9e;
     }
 
@@ -246,12 +228,11 @@
 
     .question-box {
       background: transparent;
-      border: 2px solid var(--border);
-      border-radius: var(--radius);
-      padding: 2.3vh 2.4vw;
+      border: none;
+      padding: 0.2vh 0;
       display: flex;
       flex-direction: column;
-      gap: 1.4vh;
+      gap: 1vh;
     }
 
     .question-header {
@@ -263,55 +244,54 @@
     .category-badge {
       display: inline-flex;
       align-items: center;
-      padding: 0.7vh 1.35vw;
-      border-radius: 999px;
+      padding: 0;
       background: transparent;
-      border: 2px solid var(--accent-border);
+      border: none;
       color: var(--accent);
       font-family: 'Rubik', sans-serif;
-      font-size: clamp(16px, 1.25vw, 25px);
-      font-weight: 700;
-      letter-spacing: 0.07em;
+      font-size: clamp(19px, 1.45vw, 29px);
+      font-weight: 800;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
       text-shadow: var(--text-shadow);
     }
 
     .question-text {
       font-family: 'Rubik', sans-serif;
-      font-size: clamp(30px, 2.85vw, 56px);
+      font-size: clamp(32px, 2.95vw, 58px);
       font-weight: 700;
-      line-height: 1.22;
+      line-height: 1.2;
       color: var(--text);
       text-shadow: var(--text-shadow);
     }
 
     .question-text.long {
-      font-size: clamp(25px, 2.3vw, 45px);
-      line-height: 1.24;
+      font-size: clamp(26px, 2.35vw, 46px);
+      line-height: 1.22;
     }
 
     .options-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 1.8vh 1.6vw;
+      gap: 1.6vh 1.5vw;
     }
 
     .option-card {
       display: flex;
       align-items: center;
-      gap: 1.35vw;
+      gap: 1.3vw;
       background: transparent;
       border: 2px solid var(--border);
       border-radius: var(--radius);
-      padding: 2.1vh 1.7vw;
-      min-height: 14vh;
+      padding: 1.85vh 1.55vw;
+      min-height: 14.5vh;
       transition: all 0.28s ease;
     }
 
     .option-num {
       flex-shrink: 0;
-      width: clamp(56px, 4.3vw, 84px);
-      height: clamp(56px, 4.3vw, 84px);
+      width: clamp(60px, 4.6vw, 90px);
+      height: clamp(60px, 4.6vw, 90px);
       border-radius: 16px;
       background: transparent;
       border: 2px solid var(--accent-border);
@@ -319,7 +299,7 @@
       align-items: center;
       justify-content: center;
       font-family: 'Rubik', sans-serif;
-      font-size: clamp(28px, 2.5vw, 48px);
+      font-size: clamp(32px, 2.8vw, 54px);
       font-weight: 800;
       color: var(--accent);
       text-shadow: var(--text-shadow);
@@ -334,30 +314,40 @@
     }
 
     .option-main {
-      font-size: clamp(22px, 1.95vw, 38px);
+      font-size: clamp(28px, 2.55vw, 50px);
       font-weight: 700;
-      line-height: 1.22;
+      line-height: 1.18;
       color: var(--text);
       word-wrap: break-word;
       text-shadow: var(--text-shadow);
     }
 
     .option-main.long {
-      font-size: clamp(19px, 1.55vw, 30px);
-      line-height: 1.24;
+      font-size: clamp(24px, 2.02vw, 40px);
+      line-height: 1.2;
+    }
+
+    .option-main.very-long {
+      font-size: clamp(21px, 1.72vw, 34px);
+      line-height: 1.2;
     }
 
     .option-sub {
-      font-size: clamp(17px, 1.35vw, 26px);
+      font-size: clamp(22px, 1.78vw, 35px);
       color: var(--text-muted);
-      line-height: 1.25;
+      line-height: 1.2;
       font-weight: 500;
       text-shadow: var(--text-shadow);
     }
 
     .option-sub.long {
-      font-size: clamp(15px, 1.15vw, 22px);
-      line-height: 1.25;
+      font-size: clamp(19px, 1.52vw, 30px);
+      line-height: 1.2;
+    }
+
+    .option-sub.very-long {
+      font-size: clamp(17px, 1.35vw, 26px);
+      line-height: 1.2;
     }
 
     .option-card.correct {
@@ -383,9 +373,9 @@
       border: 2px solid rgba(56, 183, 120, 0.65);
       border-left: 6px solid var(--green);
       border-radius: 16px;
-      padding: 1.7vh 1.8vw;
-      font-size: clamp(19px, 1.55vw, 30px);
-      line-height: 1.36;
+      padding: 1.4vh 1.6vw;
+      font-size: clamp(20px, 1.6vw, 31px);
+      line-height: 1.32;
       color: #eef4fc;
       text-shadow: var(--text-shadow);
       animation: fadeIn 0.3s ease;
@@ -400,20 +390,21 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Нижняя полоса таймера */
+    /* Нижняя полоса таймера во всю ширину без внешней плашки */
     .footer-bar {
       display: flex;
       align-items: center;
       gap: 1.6vw;
+      width: 100%;
       background: transparent;
-      border: 2px solid var(--border);
-      border-radius: 18px;
-      padding: 1.35vh 1.9vw;
+      border: none;
+      border-radius: 0;
+      padding: 0;
     }
 
     .timer-track {
       flex: 1;
-      height: 18px;
+      height: 22px;
       background: transparent;
       border-radius: 999px;
       overflow: hidden;
@@ -425,14 +416,14 @@
       width: 100%;
       background: var(--accent);
       border-radius: 999px;
-      transition: width 0.12s linear;
+      transition: width 0.06s linear;
     }
 
     .timer-digits {
       font-family: 'Rubik', sans-serif;
-      font-size: clamp(28px, 2.3vw, 46px);
+      font-size: clamp(32px, 2.6vw, 52px);
       font-weight: 800;
-      min-width: 2.8ch;
+      min-width: 2.3ch;
       text-align: right;
       color: var(--text);
       font-variant-numeric: tabular-nums;
@@ -440,14 +431,10 @@
       text-shadow: var(--text-shadow);
     }
 
-    .timer-digits.danger {
-      color: var(--red);
-    }
-
     .fingers-alert {
       display: none;
       font-family: 'Rubik', sans-serif;
-      font-size: clamp(22px, 1.8vw, 36px);
+      font-size: clamp(24px, 1.95vw, 38px);
       font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.06em;
@@ -492,7 +479,6 @@
     <main class="main-area">
       <section class="standby-screen" id="standbyScreen">
         <div class="standby-card">
-          <div class="standby-badge">Эфирная пауза</div>
           <h1 class="standby-title">Викторина!</h1>
           <p class="standby-sub">Четыре варианта, один таймер и одновременный ответ в камеру.</p>
           <div class="standby-meta" id="bankStatsText">Подключение к таблице...</div>
@@ -528,6 +514,7 @@
       apiUrl: '',
       clockOffset: 0,
       connectedOnce: false,
+      initialized: false,
       connError: '',
       live: {
         version: 0,
@@ -547,8 +534,9 @@
         stats: { total: 0, used: 0, unused: 0 }
       },
       lastRenderedVersion: -1,
-      lastTickSec: null,
-      endChimePlayedForId: null,
+      lastStartKey: null,
+      lastTickKey: null,
+      lastGongKey: null,
       revealedChimePlayedForId: null,
       audioCtx: null
     };
@@ -563,8 +551,27 @@
         .replace(/"/g, '&quot;');
     }
 
-    function playTone(freq, duration, type = 'sine', gainVal = 0.08) {
-      if (!obs.live.sound_on) return;
+    /* Плавный градиент таймера: от базового #6b5dd7 к ярко-красному #ff1a1a */
+    function timerBarColorAt(t) {
+      const p = Math.max(0, Math.min(1, t));
+      const h = 246.9 + (360 - 246.9) * p;
+      const s = 60.4 + (100 - 60.4) * p;
+      const l = 60.4 + (53 - 60.4) * p;
+      return `hsl(${h.toFixed(1)}, ${s.toFixed(1)}%, ${l.toFixed(1)}%)`;
+    }
+
+    /* Плавный переход цвета цифр таймера от базового белого к ярко-красному */
+    function timerDigitsColorAt(t) {
+      const p = Math.pow(Math.max(0, Math.min(1, t)), 1.35);
+      const r = Math.round(242 + (255 - 242) * p);
+      const g = Math.round(245 + (36 - 245) * p);
+      const b = Math.round(250 + (36 - 250) * p);
+      return `rgb(${r}, ${g}, ${b})`;
+    }
+
+    /* Аудиодвижок (Web Audio API) */
+    function getAudioCtx() {
+      if (!obs.live.sound_on) return null;
       try {
         if (!obs.audioCtx) {
           const Ctx = window.AudioContext || window.webkitAudioContext;
@@ -573,27 +580,229 @@
         if (obs.audioCtx.state === 'suspended') {
           obs.audioCtx.resume();
         }
-        const osc = obs.audioCtx.createOscillator();
-        const gain = obs.audioCtx.createGain();
-        osc.type = type;
-        osc.frequency.setValueAtTime(freq, obs.audioCtx.currentTime);
-        gain.gain.setValueAtTime(gainVal, obs.audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.0001, obs.audioCtx.currentTime + duration);
-        osc.connect(gain);
-        gain.connect(obs.audioCtx.destination);
-        osc.start();
-        osc.stop(obs.audioCtx.currentTime + duration);
-      } catch (e) {}
+        return obs.audioCtx;
+      } catch (e) {
+        return null;
+      }
     }
 
-    function soundTick() { playTone(660, 0.09, 'sine', 0.06); }
-    function soundEnd() {
-      playTone(880, 0.32, 'triangle', 0.09);
-      setTimeout(() => playTone(1108.7, 0.38, 'triangle', 0.08), 90);
+    /* 1. Сигнал начала отсчета времени */
+    function soundCountdownStart() {
+      const ctx = getAudioCtx();
+      if (!ctx) return;
+      const now = ctx.currentTime;
+      const notes = [587.33, 880.0];
+
+      notes.forEach((freq, idx) => {
+        const t = now + idx * 0.085;
+        const osc = ctx.createOscillator();
+        const overtone = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.type = 'triangle';
+        overtone.type = 'sine';
+        osc.frequency.setValueAtTime(freq, t);
+        overtone.frequency.setValueAtTime(freq * 2, t);
+
+        gain.gain.setValueAtTime(0.0001, t);
+        gain.gain.linearRampToValueAtTime(0.11, t + 0.012);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.28);
+
+        const ovGain = ctx.createGain();
+        ovGain.gain.setValueAtTime(0.035, t);
+        ovGain.gain.exponentialRampToValueAtTime(0.0001, t + 0.16);
+
+        osc.connect(gain);
+        overtone.connect(ovGain);
+        ovGain.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start(t);
+        overtone.start(t);
+        osc.stop(t + 0.3);
+        overtone.stop(t + 0.18);
+      });
     }
-    function soundReveal() {
-      playTone(523.25, 0.16, 'sine', 0.07);
-      setTimeout(() => playTone(659.25, 0.24, 'sine', 0.08), 110);
+
+    /* 2. Нарастающий сигнал каждой секунды из последних 10 (10 -> 1) */
+    function soundCountdownTick(sec) {
+      const ctx = getAudioCtx();
+      if (!ctx) return;
+      const now = ctx.currentTime;
+      const step = Math.max(0, Math.min(9, 10 - sec));
+      const baseFreq = 520 * Math.pow(1.095, step);
+      const sharpness = step / 9;
+
+      const oscMain = ctx.createOscillator();
+      const oscSharp = ctx.createOscillator();
+      const filter = ctx.createBiquadFilter();
+      const mainGain = ctx.createGain();
+      const sharpGain = ctx.createGain();
+      const master = ctx.createGain();
+
+      oscMain.type = step < 5 ? 'triangle' : 'sawtooth';
+      oscSharp.type = 'square';
+
+      oscMain.frequency.setValueAtTime(baseFreq, now);
+      oscSharp.frequency.setValueAtTime(baseFreq * 2, now);
+
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(1400 + sharpness * 4200, now);
+      filter.Q.setValueAtTime(1.5 + sharpness * 4.5, now);
+
+      const peak = 0.065 + sharpness * 0.05;
+      const dur = 0.115 - sharpness * 0.02;
+
+      mainGain.gain.setValueAtTime(1.0, now);
+      sharpGain.gain.setValueAtTime(0.08 + sharpness * 0.28, now);
+
+      master.gain.setValueAtTime(0.0001, now);
+      master.gain.linearRampToValueAtTime(peak, now + 0.006);
+      master.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+
+      oscMain.connect(mainGain);
+      oscSharp.connect(sharpGain);
+      mainGain.connect(filter);
+      sharpGain.connect(filter);
+      filter.connect(master);
+      master.connect(ctx.destination);
+
+      oscMain.start(now);
+      oscSharp.start(now);
+      oscMain.stop(now + dur + 0.02);
+      oscSharp.stop(now + dur + 0.02);
+    }
+
+    /* 3. Металлический гонг на отметке 0 */
+    function soundGong() {
+      const ctx = getAudioCtx();
+      if (!ctx) return;
+      const now = ctx.currentTime;
+
+      const master = ctx.createGain();
+      master.gain.setValueAtTime(0.85, now);
+      master.connect(ctx.destination);
+
+      const fundamental = 156;
+      const partials = [
+        { ratio: 1.00, detune: 0,    amp: 0.24, decay: 2.8, type: 'sine',     delay: 0 },
+        { ratio: 1.00, detune: 14,   amp: 0.18, decay: 2.6, type: 'sine',     delay: 0.015 },
+        { ratio: 1.49, detune: -8,   amp: 0.14, decay: 2.3, type: 'triangle', delay: 0.01 },
+        { ratio: 2.02, detune: 11,   amp: 0.12, decay: 2.0, type: 'sine',     delay: 0.02 },
+        { ratio: 2.74, detune: -12,  amp: 0.09, decay: 1.6, type: 'triangle', delay: 0.025 },
+        { ratio: 3.41, detune: 9,    amp: 0.07, decay: 1.3, type: 'sine',     delay: 0.03 },
+        { ratio: 4.19, detune: -7,   amp: 0.05, decay: 1.0, type: 'sine',     delay: 0.01 },
+        { ratio: 5.38, detune: 15,   amp: 0.035,decay: 0.75,type: 'sine',     delay: 0 }
+      ];
+
+      partials.forEach((p) => {
+        const t = now + p.delay;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = p.type;
+        osc.frequency.setValueAtTime(fundamental * p.ratio, t);
+        osc.detune.setValueAtTime(p.detune, t);
+        osc.frequency.exponentialRampToValueAtTime(fundamental * p.ratio * 0.992, t + p.decay);
+
+        gain.gain.setValueAtTime(0.0001, t);
+        gain.gain.linearRampToValueAtTime(p.amp, t + 0.025);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t + p.decay);
+
+        osc.connect(gain);
+        gain.connect(master);
+        osc.start(t);
+        osc.stop(t + p.decay + 0.05);
+      });
+
+      const bufSize = Math.floor(ctx.sampleRate * 0.35);
+      const noiseBuf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+      const ch = noiseBuf.getChannelData(0);
+      for (let i = 0; i < bufSize; i++) {
+        ch[i] = (Math.random() * 2 - 1) * Math.exp(-i / (ctx.sampleRate * 0.08));
+      }
+      const noise = ctx.createBufferSource();
+      noise.buffer = noiseBuf;
+      const bp = ctx.createBiquadFilter();
+      bp.type = 'bandpass';
+      bp.frequency.setValueAtTime(850, now);
+      bp.Q.setValueAtTime(1.2, now);
+      const nGain = ctx.createGain();
+      nGain.gain.setValueAtTime(0.18, now);
+      nGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.32);
+
+      noise.connect(bp);
+      bp.connect(nGain);
+      nGain.connect(master);
+      noise.start(now);
+      noise.stop(now + 0.35);
+    }
+
+    /* 4. Короткий джингл с эхом при показе правильного ответа */
+    function soundRevealJingle() {
+      const ctx = getAudioCtx();
+      if (!ctx) return;
+      const now = ctx.currentTime;
+
+      const dryBus = ctx.createGain();
+      const wetInput = ctx.createGain();
+      const delay = ctx.createDelay(1.0);
+      const feedback = ctx.createGain();
+      const echoFilter = ctx.createBiquadFilter();
+      const wetOut = ctx.createGain();
+
+      dryBus.gain.setValueAtTime(0.85, now);
+      wetInput.gain.setValueAtTime(0.65, now);
+      delay.delayTime.setValueAtTime(0.21, now);
+      feedback.gain.setValueAtTime(0.42, now);
+      echoFilter.type = 'lowpass';
+      echoFilter.frequency.setValueAtTime(2200, now);
+      wetOut.gain.setValueAtTime(0.55, now);
+
+      dryBus.connect(ctx.destination);
+      wetInput.connect(delay);
+      delay.connect(echoFilter);
+      echoFilter.connect(wetOut);
+      wetOut.connect(ctx.destination);
+      echoFilter.connect(feedback);
+      feedback.connect(delay);
+
+      const notes = [
+        { freq: 523.25, offset: 0.00, dur: 0.24, vol: 0.11 },
+        { freq: 659.25, offset: 0.075, dur: 0.24, vol: 0.11 },
+        { freq: 783.99, offset: 0.15, dur: 0.28, vol: 0.12 },
+        { freq: 1046.50, offset: 0.23, dur: 0.52, vol: 0.14 }
+      ];
+
+      notes.forEach((n) => {
+        const t = now + n.offset;
+        const osc1 = ctx.createOscillator();
+        const osc2 = ctx.createOscillator();
+        const env = ctx.createGain();
+        const ovEnv = ctx.createGain();
+
+        osc1.type = 'triangle';
+        osc2.type = 'sine';
+        osc1.frequency.setValueAtTime(n.freq, t);
+        osc2.frequency.setValueAtTime(n.freq * 2, t);
+
+        env.gain.setValueAtTime(0.0001, t);
+        env.gain.linearRampToValueAtTime(n.vol, t + 0.012);
+        env.gain.exponentialRampToValueAtTime(0.0001, t + n.dur);
+
+        ovEnv.gain.setValueAtTime(n.vol * 0.3, t);
+        ovEnv.gain.exponentialRampToValueAtTime(0.0001, t + n.dur * 0.65);
+
+        osc1.connect(env);
+        osc2.connect(ovEnv);
+        ovEnv.connect(env);
+        env.connect(dryBus);
+        env.connect(wetInput);
+
+        osc1.start(t);
+        osc2.start(t);
+        osc1.stop(t + n.dur + 0.04);
+        osc2.stop(t + n.dur + 0.04);
+      });
     }
 
     function resolveApiUrl() {
@@ -640,6 +849,12 @@
       }
     }
 
+    function getSizeClass(text, longLen, veryLongLen) {
+      if (text.length > veryLongLen) return ' very-long';
+      if (text.length > longLen) return ' long';
+      return '';
+    }
+
     function renderStaticState() {
       const l = obs.live;
       $('seasonLabel').textContent = l.season_name || 'Зимний кубок';
@@ -663,7 +878,7 @@
       const qEl = $('questionText');
       const qText = l.question.question || '';
       qEl.textContent = qText;
-      qEl.classList.toggle('long', qText.length > 95);
+      qEl.classList.toggle('long', qText.length > 92);
 
       const grid = $('optionsGrid');
       grid.innerHTML = '';
@@ -684,14 +899,14 @@
           }
         }
 
-        const mainLong = mainText.length > 42 ? ' long' : '';
-        const subLong = subText.length > 52 ? ' long' : '';
+        const mainSize = getSizeClass(mainText, 36, 72);
+        const subSize = getSizeClass(subText, 46, 82);
 
         card.innerHTML = `
           <div class="option-num">${num}</div>
           <div class="option-content">
-            <div class="option-main${mainLong}">${escapeHtml(mainText)}</div>
-            ${subText ? `<div class="option-sub${subLong}">${escapeHtml(subText)}</div>` : ''}
+            <div class="option-main${mainSize}">${escapeHtml(mainText)}</div>
+            ${subText ? `<div class="option-sub${subSize}">${escapeHtml(subText)}</div>` : ''}
           </div>
         `;
         grid.appendChild(card);
@@ -707,7 +922,7 @@
 
       if (l.revealed && l.question.id && obs.revealedChimePlayedForId !== l.question.id) {
         obs.revealedChimePlayedForId = l.question.id;
-        soundReveal();
+        soundRevealJingle();
       }
     }
 
@@ -731,22 +946,48 @@
       const ceilSec = Math.ceil(rem);
       const pct = Math.max(0, Math.min(100, (rem / total) * 100));
 
-      $('timerFill').style.width = pct + '%';
-      $('timerDigits').textContent = ceilSec;
-
       const isQuestionActive = l.screen === 'question' && !l.revealed;
-      $('timerDigits').classList.toggle('danger', isQuestionActive && ceilSec <= 5);
+      const progress = isQuestionActive ? Math.max(0, Math.min(1, 1 - (rem / total))) : 0;
+
+      const fillEl = $('timerFill');
+      const digitsEl = $('timerDigits');
+
+      fillEl.style.width = pct + '%';
+      if (isQuestionActive) {
+        const spread = Math.sin(progress * Math.PI);
+        const pLeft = Math.max(0, progress - 0.16 * spread);
+        const pRight = Math.min(1, progress + 0.14 * spread);
+        fillEl.style.background = `linear-gradient(90deg, ${timerBarColorAt(pLeft)}, ${timerBarColorAt(pRight)})`;
+        digitsEl.style.color = timerDigitsColorAt(progress);
+      } else {
+        fillEl.style.background = 'var(--accent)';
+        digitsEl.style.color = '';
+      }
+
+      digitsEl.textContent = ceilSec;
       $('fingersAlert').classList.toggle('visible', isQuestionActive && rem <= 0);
 
-      if (isQuestionActive && l.timer_status === 'running') {
-        if (ceilSec <= 3 && ceilSec > 0 && obs.lastTickSec !== ceilSec) {
-          obs.lastTickSec = ceilSec;
-          soundTick();
+      if (isQuestionActive && l.timer_status === 'running' && l.question && l.timer_end_ts) {
+        const runKey = `${l.question.id}_${l.timer_end_ts}`;
+
+        if (obs.lastStartKey !== runKey) {
+          obs.lastStartKey = runKey;
+          if (rem > 10 || rem >= total - 3) {
+            soundCountdownStart();
+          }
         }
-        const qId = l.question ? l.question.id : null;
-        if (rem <= 0 && qId && obs.endChimePlayedForId !== qId) {
-          obs.endChimePlayedForId = qId;
-          soundEnd();
+
+        if (ceilSec <= 10 && ceilSec >= 1) {
+          const tickKey = `${runKey}_${ceilSec}`;
+          if (obs.lastTickKey !== tickKey) {
+            obs.lastTickKey = tickKey;
+            soundCountdownTick(ceilSec);
+          }
+        }
+
+        if (rem <= 0 && obs.lastGongKey !== runKey) {
+          obs.lastGongKey = runKey;
+          soundGong();
         }
       }
     }
@@ -832,13 +1073,28 @@
           if (data.server_now) {
             obs.clockOffset = data.server_now - Date.now();
           }
-          const prevQId = obs.live.question ? obs.live.question.id : null;
-          const nextQId = data.live.question ? data.live.question.id : null;
-          if (prevQId !== nextQId) {
-            obs.lastTickSec = null;
-            obs.endChimePlayedForId = null;
+
+          const nextLive = data.live;
+
+          if (!obs.initialized) {
+            obs.initialized = true;
+            if (nextLive.question && nextLive.revealed) {
+              obs.revealedChimePlayedForId = nextLive.question.id;
+            }
+            if (nextLive.question && nextLive.timer_end_ts) {
+              const serverNow = Date.now() + obs.clockOffset;
+              const remOnLoad = (nextLive.timer_end_ts - serverNow) / 1000;
+              const runKey = `${nextLive.question.id}_${nextLive.timer_end_ts}`;
+              if (remOnLoad <= 0) {
+                obs.lastGongKey = runKey;
+                obs.lastStartKey = runKey;
+              } else if (remOnLoad < (Number(nextLive.timer_seconds) || 25) - 3) {
+                obs.lastStartKey = runKey;
+              }
+            }
           }
-          obs.live = data.live;
+
+          obs.live = nextLive;
           if (obs.live.version !== obs.lastRenderedVersion) {
             obs.lastRenderedVersion = obs.live.version;
             renderStaticState();
@@ -859,7 +1115,7 @@
     resolveApiUrl();
     renderStaticState();
     tickTimerVisual();
-    setInterval(tickTimerVisual, 120);
+    setInterval(tickTimerVisual, 50);
     pollLoop();
   </script>
 </body>
