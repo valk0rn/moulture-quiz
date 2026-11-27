@@ -158,7 +158,6 @@
       justify-content: space-between;
     }
 
-    /* Предпросмотр того, что сейчас в OBS (без спойлеров) */
     .preview-box {
       background: #11151d;
       border: 1px solid var(--border);
@@ -562,6 +561,7 @@
         vabank_valera: false,
         vabank_alex: false,
         timer_status: 'stopped',
+        timer_start_ts: 0,
         timer_end_ts: 0,
         timer_remaining: 25,
         stats: { total: 0, used: 0, unused: 0 }
@@ -690,21 +690,39 @@
       });
     }
 
+    function getPreDelaySec() {
+      const l = ctrl.live;
+      if (l.screen !== 'question' || l.revealed || l.timer_status !== 'running' || !l.timer_start_ts) {
+        return 0;
+      }
+      const now = Date.now() + ctrl.clockOffset;
+      return Math.max(0, Math.ceil((l.timer_start_ts - now) / 1000));
+    }
+
     function getRemainingSec() {
       const l = ctrl.live;
       if (l.screen !== 'question') return Number(l.timer_seconds) || 25;
       if (l.revealed) return 0;
       if (l.timer_status === 'running' && l.timer_end_ts) {
         const now = Date.now() + ctrl.clockOffset;
+        if (l.timer_start_ts && now < l.timer_start_ts) {
+          return Number(l.timer_seconds) || 25;
+        }
         return Math.max(0, Math.ceil((l.timer_end_ts - now) / 1000));
       }
       return Math.max(0, Number(l.timer_remaining) || 0);
     }
 
     function renderTimer() {
-      const rem = getRemainingSec();
-      const tEl = $('previewTimer');
       const l = ctrl.live;
+      const tEl = $('previewTimer');
+      const preSec = getPreDelaySec();
+      if (preSec > 0) {
+        tEl.textContent = `Старт через ${preSec} с`;
+        tEl.classList.remove('danger');
+        return;
+      }
+      const rem = getRemainingSec();
       if (l.screen === 'question' && !l.revealed && rem <= 0) {
         tEl.textContent = 'КАРТОЧКИ В КАДР!';
         tEl.classList.add('danger');
@@ -759,7 +777,6 @@
       renderTimer();
     }
 
-    /* Построение ссылок на index.html и control.html */
     function buildPageUrl(filename) {
       const current = new URL(window.location.href);
       const dir = current.pathname.replace(/[^/]*$/, '');
@@ -777,7 +794,7 @@
       }
     }
 
-    /* Живой генератор вопросов из AniList API */
+    /* Живой генератор 12 вопросов из AniList API (загружает 100 тайтлов с 2 страниц за 1 запрос) */
     function shuffle(arr) {
       const a = arr.slice();
       for (let i = a.length - 1; i > 0; i--) {
@@ -806,7 +823,7 @@
 
       function pickFour(filterFn, validatorFn) {
         const candidates = shuffle(mediaList.filter(m => !usedMediaIds.has(m.id) && filterFn(m)));
-        for (let attempt = 0; attempt < 40 && candidates.length >= 4; attempt++) {
+        for (let attempt = 0; attempt < 60 && candidates.length >= 4; attempt++) {
           const sample = shuffle(candidates).slice(0, 4);
           if (validatorFn(sample)) {
             sample.forEach(m => usedMediaIds.add(m.id));
@@ -816,9 +833,10 @@
         return null;
       }
 
+      // 3 вопроса: Какое аниме вышло раньше остальных?
       for (let k = 0; k < 3; k++) {
         const four = pickFour(
-          m => m.startDate && m.startDate.year >= 1978 && m.startDate.year <= 2025,
+          m => m.startDate && m.startDate.year >= 1978 && m.startDate.year <= 2026,
           s => {
             const years = s.map(x => x.startDate.year);
             const minY = Math.min(...years);
@@ -841,6 +859,7 @@
         }
       }
 
+      // 3 вопроса: У какого тайтла выше оценка на AniList?
       for (let k = 0; k < 3; k++) {
         const four = pickFour(
           m => m.averageScore && m.averageScore >= 55,
@@ -865,6 +884,7 @@
         }
       }
 
+      // 3 вопроса: В каком телесериале больше всего эпизодов?
       for (let k = 0; k < 3; k++) {
         const four = pickFour(
           m => m.format === 'TV' && m.episodes && m.episodes >= 6 && m.episodes <= 300,
@@ -889,21 +909,30 @@
         }
       }
 
-      const withStudio = shuffle(mediaList.filter(
+      // 3 вопроса: Какой тайтл сняла указанная студия?
+      let withStudio = shuffle(mediaList.filter(
         m => !usedMediaIds.has(m.id) && m.studios && m.studios.nodes && m.studios.nodes.length > 0
       ));
+      const usedStudios = new Set();
       for (let k = 0; k < 3 && withStudio.length >= 4; k++) {
-        const target = withStudio.shift();
+        const targetIdx = withStudio.findIndex(m => !usedStudios.has(m.studios.nodes[0].name));
+        if (targetIdx === -1) break;
+        const target = withStudio.splice(targetIdx, 1)[0];
         const targetStudio = target.studios.nodes[0].name;
         const others = shuffle(withStudio.filter(
           m => !m.studios.nodes.some(st => st.name === targetStudio)
         )).slice(0, 3);
         if (others.length === 3) {
+          usedStudios.add(targetStudio);
+          const takenIds = new Set([target.id, ...others.map(o => o.id)]);
+          withStudio = withStudio.filter(m => !takenIds.has(m.id));
+          takenIds.forEach(id => usedMediaIds.add(id));
+
           const four = shuffle([target, ...others]);
           const correctIdx = four.findIndex(x => x.id === target.id) + 1;
           const summary = four.map(x => `${shortTitle(x)} — ${x.studios.nodes[0].name}`).join(' · ');
           generated.push({
-            id: `al_studio_${target.id}_${others.map(x => x.id).join('_')}`,
+            id: `al_studio_${target.id}_${others.map(x => x.id).sort().join('_')}`,
             category: 'СТУДИЙНЫЙ ПОЧЕРК',
             question: `Какой из этих тайтлов сняла студия ${targetStudio}?`,
             options: four.map(formatAnimeOption),
@@ -922,13 +951,27 @@
         logMsg('Сначала подключи ссылку Google Apps Script.');
         return;
       }
-      logMsg('Запрашиваю свежую подборку из AniList...');
+      logMsg('Запрашиваю 100 тайтлов из AniList для сборки 12 вопросов...');
       try {
         const sortMode = Math.random() > 0.4 ? 'POPULARITY_DESC' : 'SCORE_DESC';
-        const page = Math.floor(Math.random() * 28) + 1;
+        const page1 = Math.floor(Math.random() * 26) + 1;
+        let page2 = Math.floor(Math.random() * 26) + 1;
+        if (page2 === page1) page2 = (page1 % 26) + 1;
+
         const query = `
-          query ($page: Int, $sort: [MediaSort]) {
-            Page(page: $page, perPage: 50) {
+          query ($p1: Int, $p2: Int, $sort: [MediaSort]) {
+            p1: Page(page: $p1, perPage: 50) {
+              media(type: ANIME, sort: $sort, isAdult: false, format_in: [TV, MOVIE, OVA]) {
+                id
+                title { romaji english }
+                startDate { year }
+                averageScore
+                episodes
+                format
+                studios(isMain: true) { nodes { name } }
+              }
+            }
+            p2: Page(page: $p2, perPage: 50) {
               media(type: ANIME, sort: $sort, isAdult: false, format_in: [TV, MOVIE, OVA]) {
                 id
                 title { romaji english }
@@ -944,16 +987,23 @@
         const res = await fetch('https://graphql.anilist.co', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-          body: JSON.stringify({ query, variables: { page, sort: [sortMode] } })
+          body: JSON.stringify({ query, variables: { p1: page1, p2: page2, sort: [sortMode] } })
         });
         const json = await res.json();
-        const list = (json.data && json.data.Page && json.data.Page.media) || [];
+        const raw1 = (json.data && json.data.p1 && json.data.p1.media) || [];
+        const raw2 = (json.data && json.data.p2 && json.data.p2.media) || [];
+        const uniqueMap = new Map();
+        [...raw1, ...raw2].forEach(m => {
+          if (m && m.id && !uniqueMap.has(m.id)) uniqueMap.set(m.id, m);
+        });
+        const list = Array.from(uniqueMap.values());
+
         const newQs = buildAniListQuestions(list);
         if (!newQs.length) throw new Error('Не удалось собрать вопросы, попробуй еще раз.');
 
         const resp = await apiPost({ action: 'addQuestions', questions: newQs });
         if (resp) {
-          logMsg(`AniList: добавлено ${resp.added} новых вопросов. Всего в колоде: ${resp.live.stats.unused}.`);
+          logMsg(`AniList: собрано ${newQs.length}, добавлено в таблицу ${resp.added} новых вопросов. Всего в колоде: ${resp.live.stats.unused}.`);
         }
       } catch (err) {
         logMsg('Ошибка AniList: ' + err.message);
@@ -988,7 +1038,7 @@
     $('btnNext').addEventListener('click', async () => {
       logMsg('Выбираю случайный вопрос для OBS...');
       const r = await apiPost({ action: 'nextQuestion' });
-      if (r) logMsg('Вопрос отправлен в OBS, таймер запущен.');
+      if (r) logMsg('Вопрос отправлен в OBS. Отсчет начнется через 5 секунд.');
     });
 
     $('btnTimerToggle').addEventListener('click', async () => {

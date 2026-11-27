@@ -536,6 +536,7 @@
         vabank_valera: false,
         vabank_alex: false,
         timer_status: 'stopped',
+        timer_start_ts: 0,
         timer_end_ts: 0,
         timer_remaining: 25,
         stats: { total: 0, used: 0, unused: 0 }
@@ -941,6 +942,9 @@
       if (l.revealed) return 0;
       if (l.timer_status === 'running' && l.timer_end_ts) {
         const serverNow = Date.now() + obs.clockOffset;
+        if (l.timer_start_ts && serverNow < l.timer_start_ts) {
+          return Number(l.timer_seconds) || 25;
+        }
         return Math.max(0, (l.timer_end_ts - serverNow) / 1000);
       }
       return Math.max(0, Number(l.timer_remaining) || 0);
@@ -949,13 +953,21 @@
     function tickTimerVisual() {
       const l = obs.live;
       const total = Math.max(1, Number(l.timer_seconds) || 25);
-      const rem = getRemainingSeconds();
+      const serverNow = Date.now() + obs.clockOffset;
+      const isQuestionActive = l.screen === 'question' && !l.revealed;
+      const inPreDelay = Boolean(
+        isQuestionActive &&
+        l.timer_status === 'running' &&
+        l.timer_start_ts &&
+        serverNow < l.timer_start_ts
+      );
+
+      const rem = inPreDelay ? total : getRemainingSeconds();
       const ceilSec = Math.ceil(rem);
       const pct = Math.max(0, Math.min(100, (rem / total) * 100));
 
-      const isQuestionActive = l.screen === 'question' && !l.revealed;
-      const progress = isQuestionActive ? Math.max(0, Math.min(1, 1 - (rem / total))) : 0;
-      const timeUp = isQuestionActive && rem <= 0;
+      const progress = (isQuestionActive && !inPreDelay) ? Math.max(0, Math.min(1, 1 - (rem / total))) : 0;
+      const timeUp = isQuestionActive && !inPreDelay && rem <= 0;
 
       const fillEl = $('timerFill');
       const trackEl = $('timerTrack');
@@ -964,7 +976,7 @@
       fillEl.style.width = pct + '%';
       trackEl.classList.toggle('expired', timeUp);
 
-      if (isQuestionActive) {
+      if (isQuestionActive && !inPreDelay) {
         const spread = Math.sin(progress * Math.PI);
         const pLeft = Math.max(0, progress - 0.16 * spread);
         const pRight = Math.min(1, progress + 0.14 * spread);
@@ -978,7 +990,7 @@
       digitsEl.textContent = ceilSec;
       $('fingersAlert').classList.toggle('visible', timeUp);
 
-      if (isQuestionActive && l.timer_status === 'running' && l.question && l.timer_end_ts) {
+      if (isQuestionActive && l.timer_status === 'running' && !inPreDelay && l.question && l.timer_end_ts) {
         const runKey = `${l.question.id}_${l.timer_end_ts}`;
 
         if (obs.lastStartKey !== runKey) {
@@ -1100,12 +1112,15 @@
             }
             if (nextLive.question && nextLive.timer_end_ts) {
               const serverNow = Date.now() + obs.clockOffset;
-              const remOnLoad = (nextLive.timer_end_ts - serverNow) / 1000;
+              const inPreOnLoad = Boolean(nextLive.timer_start_ts && serverNow < nextLive.timer_start_ts);
+              const remOnLoad = inPreOnLoad
+                ? (Number(nextLive.timer_seconds) || 25)
+                : (nextLive.timer_end_ts - serverNow) / 1000;
               const runKey = `${nextLive.question.id}_${nextLive.timer_end_ts}`;
               if (remOnLoad <= 0) {
                 obs.lastGongKey = runKey;
                 obs.lastStartKey = runKey;
-              } else if (remOnLoad < (Number(nextLive.timer_seconds) || 25) - 3) {
+              } else if (!inPreOnLoad && remOnLoad < (Number(nextLive.timer_seconds) || 25) - 3) {
                 obs.lastStartKey = runKey;
               }
             }
