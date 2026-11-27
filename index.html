@@ -409,6 +409,11 @@
       border-radius: 999px;
       overflow: hidden;
       border: 2px solid var(--border);
+      transition: border-color 0.2s ease;
+    }
+
+    .timer-track.expired {
+      border-color: var(--red);
     }
 
     .timer-fill {
@@ -438,7 +443,7 @@
       font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.06em;
-      color: var(--accent);
+      color: var(--red);
       text-shadow: var(--text-shadow);
       animation: pulse 0.75s infinite alternate;
       white-space: nowrap;
@@ -498,17 +503,17 @@
     </main>
 
     <footer class="footer-bar">
-      <div class="timer-track">
+      <div class="timer-track" id="timerTrack">
         <div class="timer-fill" id="timerFill"></div>
       </div>
-      <span class="fingers-alert" id="fingersAlert">ПАЛЬЦЫ В КАДР!</span>
+      <span class="fingers-alert" id="fingersAlert">КАРТОЧКИ В КАДР!</span>
       <div class="timer-digits" id="timerDigits">25</div>
     </footer>
   </div>
 
   <script>
     const STORAGE_KEY = 'moulture_quiz_config_v2';
-    const POLL_MS = 1200;
+    const POLL_MS = 2000;
 
     const obs = {
       apiUrl: '',
@@ -516,6 +521,7 @@
       connectedOnce: false,
       initialized: false,
       connError: '',
+      errorCount: 0,
       live: {
         version: 0,
         season_name: 'Зимний кубок',
@@ -560,7 +566,7 @@
       return `hsl(${h.toFixed(1)}, ${s.toFixed(1)}%, ${l.toFixed(1)}%)`;
     }
 
-    /* Плавный переход цвета цифр таймера от базового белого к ярко-красному */
+    /* Плавный переход цвета цифр таймера от базового белого к ярко-красному (#ff2424) */
     function timerDigitsColorAt(t) {
       const p = Math.pow(Math.max(0, Math.min(1, t)), 1.35);
       const r = Math.round(242 + (255 - 242) * p);
@@ -948,11 +954,15 @@
 
       const isQuestionActive = l.screen === 'question' && !l.revealed;
       const progress = isQuestionActive ? Math.max(0, Math.min(1, 1 - (rem / total))) : 0;
+      const timeUp = isQuestionActive && rem <= 0;
 
       const fillEl = $('timerFill');
+      const trackEl = $('timerTrack');
       const digitsEl = $('timerDigits');
 
       fillEl.style.width = pct + '%';
+      trackEl.classList.toggle('expired', timeUp);
+
       if (isQuestionActive) {
         const spread = Math.sin(progress * Math.PI);
         const pLeft = Math.max(0, progress - 0.16 * spread);
@@ -965,7 +975,7 @@
       }
 
       digitsEl.textContent = ceilSec;
-      $('fingersAlert').classList.toggle('visible', isQuestionActive && rem <= 0);
+      $('fingersAlert').classList.toggle('visible', timeUp);
 
       if (isQuestionActive && l.timer_status === 'running' && l.question && l.timer_end_ts) {
         const runKey = `${l.question.id}_${l.timer_end_ts}`;
@@ -992,8 +1002,8 @@
       }
     }
 
-    /* Обходная загрузка через JSONP (без CORS-проблем в браузере OBS) */
-    function pollViaJsonp(url, timeoutMs = 6000) {
+    /* Обходная загрузка через JSONP (щадящий режим без дублирующих штормов запросов) */
+    function pollViaJsonp(url, timeoutMs = 8000) {
       return new Promise((resolve, reject) => {
         const cbName = '__mqCb_' + Date.now() + '_' + Math.floor(Math.random() * 100000);
         const script = document.createElement('script');
@@ -1009,7 +1019,9 @@
           if (settled) return;
           settled = true;
           cleanup();
-          reject(new Error('Таймаут ответа от script.google.com'));
+          const err = new Error('Таймаут ответа от script.google.com');
+          err.isTimeout = true;
+          reject(err);
         }, timeoutMs);
 
         window[cbName] = (data) => {
@@ -1051,6 +1063,9 @@
       try {
         return await pollViaJsonp(obs.apiUrl);
       } catch (jsonpErr) {
+        if (jsonpErr && jsonpErr.isTimeout) {
+          throw jsonpErr;
+        }
         try {
           return await pollViaFetch(obs.apiUrl);
         } catch (fetchErr) {
@@ -1070,6 +1085,7 @@
         if (data && data.ok && data.live) {
           obs.connectedOnce = true;
           obs.connError = '';
+          obs.errorCount = 0;
           if (data.server_now) {
             obs.clockOffset = data.server_now - Date.now();
           }
@@ -1102,14 +1118,17 @@
             renderBankStatus();
           }
         } else {
+          obs.errorCount++;
           obs.connError = 'Ошибка таблицы: ' + ((data && data.error) ? data.error : 'пустой ответ');
           renderBankStatus();
         }
       } catch (err) {
+        obs.errorCount++;
         obs.connError = err.message || 'Ошибка подключения к таблице';
         renderBankStatus();
       }
-      setTimeout(pollLoop, POLL_MS);
+      const nextDelay = obs.errorCount > 0 ? Math.min(8000, POLL_MS * (obs.errorCount + 1)) : POLL_MS;
+      setTimeout(pollLoop, nextDelay);
     }
 
     resolveApiUrl();
